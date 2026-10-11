@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/passage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/panel"
+        android:fontFamily="serif"
+        android:lineSpacingMultiplier="1.3"
+        android:padding="16dp"
+        android:textIsSelectable="false"
+        android:textSize="22sp" />
+
+    <EditText
+        android:id="@+id/typing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/input"
+        android:hint="Start typing the passage above…"
+        android:minLines="2"
+        android:padding="16dp"
+        android:textColor="@color/text"
+        android:textColorHint="@color/muted"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/muted"
+        android:textSize="16sp" />
+</LinearLayout>

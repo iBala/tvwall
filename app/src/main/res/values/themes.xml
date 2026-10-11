@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#0F1218</color>
+    <color name="panel">#181C25</color>
+    <color name="text">#E8EAF0</color>
+    <color name="muted">#9AA3B2</color>
+    <color name="good">#4ADE80</color>
+    <color name="accent">#F5C542</color>
+    <color name="bad">#F87171</color>
+
+    <style name="Theme.TvWall" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>

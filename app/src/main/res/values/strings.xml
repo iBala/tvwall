@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TV Wall</string>
+    <string name="service_description">Counts how long the TV is on each day. When the daily allowance runs out, it shows a typing challenge and puts the TV in standby.</string>
+</resources>

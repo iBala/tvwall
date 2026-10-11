@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:textColor="@color/accent"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daily TV time"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical">
+
+        <Button android:id="@+id/limitDown" style="@style/TvButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="−" />
+        <TextView android:id="@+id/limit"
+            android:layout_width="200dp" android:layout_height="wrap_content"
+            android:gravity="center" android:textSize="22sp" />
+        <Button android:id="@+id/limitUp" style="@style/TvButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="+" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Extra time per typed passage"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="center_vertical">
+
+        <Button android:id="@+id/unlockDown" style="@style/TvButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="−" />
+        <TextView android:id="@+id/unlock"
+            android:layout_width="200dp" android:layout_height="wrap_content"
+            android:gravity="center" android:textSize="22sp" />
+        <Button android:id="@+id/unlockUp" style="@style/TvButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="+" />
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No TV after (until 06:00)"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="center_vertical">
+
+        <Button android:id="@+id/curfewDown" style="@style/TvButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="−" />
+        <TextView android:id="@+id/curfew"
+            android:layout_width="200dp" android:layout_height="wrap_content"
+            android:gravity="center" android:textSize="22sp" />
+        <Button android:id="@+id/curfewUp" style="@style/TvButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="+" />
+    </LinearLayout>
+</LinearLayout>
