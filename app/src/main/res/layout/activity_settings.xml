@@ -27,6 +27,15 @@
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
+        <Button
+            android:id="@+id/openAccessibility"
+            style="@style/TvButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Open Accessibility settings"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/today"
             android:layout_width="wrap_content"

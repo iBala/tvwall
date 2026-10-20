@@ -38,12 +38,6 @@ class BlockActivity : Activity() {
         setContentView(R.layout.activity_block)
         store = Store(this)
         countdown = findViewById(R.id.countdown)
-        val curfew = store.isCurfew
-        findViewById<TextView>(R.id.title).text =
-            if (curfew) "No TV until ${formatClock(Store.CURFEW_END)}" else "TV time is up for today"
-        findViewById<TextView>(R.id.summary).text =
-            (if (curfew) "It's past curfew. " else "You've watched ${formatDuration(store.usedMs)} today. ") +
-                "Type the passage below exactly to get ${store.today.unlockMinutes} more minutes."
         findViewById<Button>(R.id.off).setOnClickListener { WatchService.instance?.sleepTv() }
 
         input = findViewById(R.id.typing)
@@ -66,6 +60,7 @@ class BlockActivity : Activity() {
         super.onResume()
         isShowing = true
         if (!store.isBlocked) return finish()
+        renderReason()
         // Coming back from Home or standby can leave focus on the button, so
         // typing would go nowhere.
         input.requestFocus()
@@ -88,6 +83,17 @@ class BlockActivity : Activity() {
     // this screen straight back, so swallow it instead.
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean =
         keyCode == KeyEvent.KEYCODE_BACK || super.onKeyDown(keyCode, event)
+
+    // Refreshed on every resume: the screen can stay open while the reason
+    // changes, e.g. the daily limit runs out and then curfew starts.
+    private fun renderReason() {
+        val curfew = store.isCurfew
+        findViewById<TextView>(R.id.title).text =
+            if (curfew) "No TV until ${formatClock(Store.CURFEW_END)}" else "TV time is up for today"
+        findViewById<TextView>(R.id.summary).text =
+            (if (curfew) "It's past curfew. " else "You've watched ${formatDuration(store.usedMs)} today. ") +
+                "Type the passage below exactly to get ${store.today.unlockMinutes} more minutes."
+    }
 
     private fun renderCountdown() {
         countdown.text = "TV turns off in ${secondsLeft}s unless you keep typing."

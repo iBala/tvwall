@@ -2,7 +2,9 @@ package com.ibala.tvwall
 
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Button
@@ -62,6 +64,9 @@ class SettingsActivity : Activity() {
         val rules = findViewById<LinearLayout>(R.id.rules)
         sections.forEach { it.bind(rules) }
         findViewById<Button>(R.id.save).setOnClickListener { save() }
+        findViewById<Button>(R.id.openAccessibility).setOnClickListener {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
         findViewById<Button>(R.id.cancel).setOnClickListener { resetForm(); showForm() }
     }
 
@@ -79,9 +84,10 @@ class SettingsActivity : Activity() {
     private fun renderAll() {
         val on = isServiceEnabled()
         findViewById<TextView>(R.id.service).apply {
-            text = if (on) "● Watching the TV" else "● Not running. Turn on TV Wall in Settings → Accessibility."
+            text = if (on) "● Watching the TV" else "● Not running. Turn on TV Wall in Accessibility settings."
             setTextColor(getColor(if (on) R.color.good else R.color.bad))
         }
+        findViewById<View>(R.id.openAccessibility).show(!on)
         val day = if (Store.isWeekend(LocalDate.now())) "weekend" else "weekday"
         findViewById<TextView>(R.id.today).text =
             "Today is a $day  ·  Watched: ${formatDuration(store.usedMs)}  ·  " + when {
@@ -132,7 +138,8 @@ class SettingsActivity : Activity() {
         findViewById<FrameLayout>(R.id.challengeHost).removeAllViews()
         findViewById<View>(R.id.confirm).show(false)
         findViewById<View>(R.id.form).show(true)
-        findViewById<View>(R.id.save).requestFocus()
+        val setup = findViewById<View>(R.id.openAccessibility)
+        (if (setup.visibility == View.VISIBLE) setup else findViewById(R.id.save)).requestFocus()
     }
 
     private fun isServiceEnabled(): Boolean =
