@@ -1,7 +1,10 @@
 package com.ibala.tvwall
 
 import android.accessibilityservice.AccessibilityService
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -20,6 +23,14 @@ class WatchService : AccessibilityService() {
     private lateinit var store: Store
     private lateinit var power: PowerManager
     private var lastTick = 0L
+    // The screensaver keeps the TV "interactive", but nobody is watching.
+    private var dreaming = false
+
+    private val dreamReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            dreaming = intent.action == Intent.ACTION_DREAMING_STARTED
+        }
+    }
 
     private val tick = object : Runnable {
         override fun run() {
@@ -33,11 +44,16 @@ class WatchService : AccessibilityService() {
         store = Store(this)
         power = getSystemService(PowerManager::class.java)
         lastTick = SystemClock.elapsedRealtime()
+        registerReceiver(dreamReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_DREAMING_STARTED)
+            addAction(Intent.ACTION_DREAMING_STOPPED)
+        })
         handler.post(tick)
     }
 
     override fun onDestroy() {
         handler.removeCallbacks(tick)
+        if (::store.isInitialized) unregisterReceiver(dreamReceiver)
         if (instance === this) instance = null
         super.onDestroy()
     }
@@ -54,9 +70,10 @@ class WatchService : AccessibilityService() {
         val now = SystemClock.elapsedRealtime()
         val delta = now - lastTick
         lastTick = now
-        // Only count time while the screen is on. A long gap means the process
+        // Only count time while the screen is on and showing TV: not the
+        // screensaver, and not the block screen. A long gap means the process
         // was frozen or the TV was in standby, so it doesn't count.
-        if (power.isInteractive && delta <= TICK_MS * 3) store.addUsage(delta)
+        if (power.isInteractive && !dreaming && !store.isBlocked && delta <= TICK_MS * 3) store.addUsage(delta)
         warn()
         enforce()
     }

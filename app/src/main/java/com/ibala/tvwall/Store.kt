@@ -9,29 +9,29 @@ import java.time.ZoneId
 // All state lives in one SharedPreferences file. Usage is per calendar day:
 // the first read on a new day wipes yesterday's counters.
 //
-// Rules are kept separately for weekdays (Mon-Fri) and weekends (Sat, Sun):
+// Rules are kept separately for weekdays (Mon-Thu), Friday and weekends (Sat, Sun):
 //  - a daily allowance of screen-on time,
 //  - how much extra time a typed passage buys,
 //  - an optional curfew: no TV from that time until CURFEW_END the next morning.
 class Store(context: Context) {
     private val prefs = context.getSharedPreferences("tvwall", Context.MODE_PRIVATE)
 
-    fun rules(weekend: Boolean) = Rules(
-        limitMinutes = prefs.getInt(key(KEY_LIMIT, weekend), if (weekend) 300 else 72),
-        unlockMinutes = prefs.getInt(key(KEY_UNLOCK, weekend), if (weekend) 60 else 15),
-        curfewMinute = prefs.getInt(key(KEY_CURFEW, weekend), if (weekend) NO_CURFEW else 20 * 60),
+    fun rules(day: Day) = Rules(
+        limitMinutes = prefs.getInt(KEY_LIMIT + day.key, day.defaults.limitMinutes),
+        unlockMinutes = prefs.getInt(KEY_UNLOCK + day.key, day.defaults.unlockMinutes),
+        curfewMinute = prefs.getInt(KEY_CURFEW + day.key, day.defaults.curfewMinute),
     )
 
-    fun setRules(weekend: Boolean, r: Rules) {
+    fun setRules(day: Day, r: Rules) {
         prefs.edit()
-            .putInt(key(KEY_LIMIT, weekend), r.limitMinutes)
-            .putInt(key(KEY_UNLOCK, weekend), r.unlockMinutes)
-            .putInt(key(KEY_CURFEW, weekend), r.curfewMinute)
+            .putInt(KEY_LIMIT + day.key, r.limitMinutes)
+            .putInt(KEY_UNLOCK + day.key, r.unlockMinutes)
+            .putInt(KEY_CURFEW + day.key, r.curfewMinute)
             .apply()
     }
 
     // Today's rules.
-    val today: Rules get() = rules(isWeekend(LocalDate.now()))
+    val today: Rules get() = rules(Day.of(LocalDate.now()))
 
     // Screen-on time today, in milliseconds.
     val usedMs: Long
@@ -100,7 +100,7 @@ class Store(context: Context) {
 
     private fun todayCurfewStart(): Long? {
         val date = LocalDate.now()
-        val minute = rules(isWeekend(date)).curfewMinute
+        val minute = rules(Day.of(date)).curfewMinute
         if (minute == NO_CURFEW) return null
         return epochMs(date.atStartOfDay().plusMinutes(minute.toLong()))
     }
@@ -110,7 +110,7 @@ class Store(context: Context) {
     // morning, so after midnight it's yesterday's rule that applies.
     private fun curfewWindowAt(t: LocalDateTime): Pair<Long, Long>? {
         for (date in listOf(t.toLocalDate(), t.toLocalDate().minusDays(1))) {
-            val minute = rules(isWeekend(date)).curfewMinute
+            val minute = rules(Day.of(date)).curfewMinute
             if (minute == NO_CURFEW) continue
             val start = date.atStartOfDay().plusMinutes(minute.toLong())
             val end = date.plusDays(1).atStartOfDay().plusMinutes(CURFEW_END.toLong())
@@ -134,7 +134,20 @@ class Store(context: Context) {
         return prefs
     }
 
-    private fun key(base: String, weekend: Boolean) = base + if (weekend) "Weekend" else "Weekday"
+    // Which rule set a date uses. `key` suffixes the stored prefs.
+    enum class Day(val key: String, val defaults: Rules) {
+        WEEKDAY("Weekday", Rules(72, 15, 20 * 60)),
+        FRIDAY("Friday", Rules(180, 15, 20 * 60)),
+        WEEKEND("Weekend", Rules(300, 60, NO_CURFEW));
+
+        companion object {
+            fun of(date: LocalDate) = when (date.dayOfWeek) {
+                DayOfWeek.FRIDAY -> FRIDAY
+                DayOfWeek.SATURDAY, DayOfWeek.SUNDAY -> WEEKEND
+                else -> WEEKDAY
+            }
+        }
+    }
 
     data class Rules(val limitMinutes: Int, val unlockMinutes: Int, val curfewMinute: Int) {
         // Every field is ordered so that a bigger value is looser.
@@ -162,9 +175,6 @@ class Store(context: Context) {
         val UNLOCK_STEPS = listOf(5, 10, 15, 30, 60)
         // 18:00 to 23:30 in half hours, then off.
         val CURFEW_STEPS = (36..47).map { it * 30 } + NO_CURFEW
-
-        fun isWeekend(date: LocalDate) =
-            date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY
     }
 }
 

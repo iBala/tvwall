@@ -13,15 +13,16 @@ class DebugReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val store = Store(context)
         if (intent.hasExtra("used_ms")) store.addUsage(intent.getLongExtra("used_ms", 0) - store.usedMs)
-        for ((extra, weekend) in listOf("curfew_weekday" to false, "curfew_weekend" to true)) {
+        for (day in Store.Day.entries) {
+            val extra = "curfew_" + day.key.lowercase()
             if (intent.hasExtra(extra)) {
-                store.setRules(weekend, store.rules(weekend).copy(curfewMinute = intent.getIntExtra(extra, 0)))
+                store.setRules(day, store.rules(day).copy(curfewMinute = intent.getIntExtra(extra, 0)))
             }
         }
         Log.i(
             "TvWall",
             "used=${store.usedMs} remaining=${store.remainingMs} blocked=${store.isBlocked} " +
-                "curfew=${store.isCurfew} weekday=${store.rules(false)} weekend=${store.rules(true)}"
+                "curfew=${store.isCurfew} " + Store.Day.entries.joinToString(" ") { "${it.key}=${store.rules(it)}" }
         )
     }
 }

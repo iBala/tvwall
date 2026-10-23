@@ -32,18 +32,18 @@ Each passage teaches something: a surprising fact, a mental model, or a useful l
 
 ## Features
 
-- **Separate rules for weekdays and weekends.** Each has a daily allowance, extra time per typed passage, and an optional curfew.
-- **Counts screen-on time only.** Standby doesn't count. The count resets at midnight.
+- **Separate rules for weekdays (Mon–Thu), Friday and weekends.** Each has a daily allowance, extra time per typed passage, and an optional curfew.
+- **Counts screen-on time only.** Standby, the screensaver and time spent on the wall don't count. The count resets at midnight.
 - **Curfew.** "No TV after 20:00" blocks the TV from 20:00 until 06:00 the next morning. A Friday curfew covers early Saturday too.
 - **A wall you can't click past.** Pressing Home, Back or opening another app brings the wall back within a second.
 - **Switches the TV off.** After 60 seconds with no typing, the TV goes to standby. The wall is still there when you turn it back on.
-- **Typing earns extra time.** Type the passage exactly to get more time: 5, 10, 15, 30 or 60 minutes, set separately for weekdays and weekends.
+- **Typing earns extra time.** Type the passage exactly to get more time: 5, 10, 15, 30 or 60 minutes, set separately for weekdays, Friday and weekends.
 - **No shortcuts.** A wrong character, a backspace, a paste or an autocorrect clears the input and swaps in a new passage. Suggestions are turned off.
 - **Warnings.** A message appears 5 minutes and 1 minute before time runs out.
 - **Loosening is locked.** Making a rule stricter saves instantly. Giving yourself more time, longer unlocks or a later curfew means typing a passage first.
 - **Private.** No internet permission, no accounts, no analytics. See [PRIVACY.md](PRIVACY.md).
 
-The default rules are 1h 12m a day with 15-minute unlocks and no TV after 20:00 on weekdays, and 5 hours a day with 60-minute unlocks and no curfew on weekends. Lowering them saves at once. Raising them needs one typed passage, like any other loosening.
+The default rules are 1h 12m a day with 15-minute unlocks and no TV after 20:00 Monday to Thursday, the same on Friday but with 3 hours a day, and 5 hours a day with 60-minute unlocks and no curfew on weekends. Lowering them saves at once. Raising them needs one typed passage, like any other loosening.
 
 ## Install
 
@@ -83,7 +83,7 @@ adb shell settings put secure accessibility_enabled 1
 
 ### 3. Set your rules
 
-Pick the daily time, the extra time each passage earns, and the curfew for weekdays and weekends, then press **Save**.
+Pick the daily time, the extra time each passage earns, and the curfew for weekdays, Friday and weekends, then press **Save**.
 
 **Tip:** typing with a remote is slow. The Google TV app on your phone has a keyboard that types straight into the TV.
 
@@ -110,7 +110,7 @@ app/src/main/java/com/ibala/tvwall/
   WatchService.kt      accessibility service: counts time, enforces, switches the TV off
   BlockActivity.kt     the wall: passage challenge and 60 s idle standby
   Challenge.kt         the typing challenge, ported from Typewall's challenge.js
-  SettingsActivity.kt  weekday and weekend rules; loosening needs a passage
+  SettingsActivity.kt  weekday, Friday and weekend rules; loosening needs a passage
   Store.kt             rules, curfew windows and daily usage in SharedPreferences
 app/src/main/assets/passages.txt   the 100 passages
 ```

@@ -13,14 +13,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import java.time.LocalDate
 
-// Launcher screen: today's usage and the rules for weekdays and weekends. As in
-// Typewall, making a rule stricter is instant; loosening it (more daily time,
-// longer unlocks, a later or no curfew) means typing a passage first.
+// Launcher screen: today's usage and the rules for weekdays, Friday and
+// weekends. As in Typewall, making a rule stricter is instant; loosening it
+// (more daily time, longer unlocks, a later or no curfew) means typing a
+// passage first.
 class SettingsActivity : Activity() {
     private lateinit var store: Store
-    private val sections = listOf(Section(false, "Weekdays (Mon–Fri)"), Section(true, "Weekends (Sat & Sun)"))
+    private val sections = listOf(
+        Section(Store.Day.WEEKDAY, "Weekdays (Mon–Thu)"),
+        Section(Store.Day.FRIDAY, "Friday"),
+        Section(Store.Day.WEEKEND, "Weekends (Sat & Sun)"),
+    )
 
-    private inner class Section(val weekend: Boolean, val title: String) {
+    private inner class Section(val day: Store.Day, val title: String) {
         lateinit var draft: Store.Rules
         lateinit var view: View
 
@@ -54,7 +59,7 @@ class SettingsActivity : Activity() {
             }
         }
 
-        val saved get() = store.rules(weekend)
+        val saved get() = store.rules(day)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,9 +93,13 @@ class SettingsActivity : Activity() {
             setTextColor(getColor(if (on) R.color.good else R.color.bad))
         }
         findViewById<View>(R.id.openAccessibility).show(!on)
-        val day = if (Store.isWeekend(LocalDate.now())) "weekend" else "weekday"
+        val day = when (Store.Day.of(LocalDate.now())) {
+            Store.Day.WEEKDAY -> "a weekday"
+            Store.Day.FRIDAY -> "Friday"
+            Store.Day.WEEKEND -> "the weekend"
+        }
         findViewById<TextView>(R.id.today).text =
-            "Today is a $day  ·  Watched: ${formatDuration(store.usedMs)}  ·  " + when {
+            "Today is $day  ·  Watched: ${formatDuration(store.usedMs)}  ·  " + when {
                 store.isCurfew -> "Curfew"
                 store.isBlocked -> "Time's up"
                 else -> "Left: ${formatDuration(store.remainingMs)}"
@@ -111,7 +120,7 @@ class SettingsActivity : Activity() {
     }
 
     private fun apply() {
-        sections.forEach { store.setRules(it.weekend, it.draft) }
+        sections.forEach { store.setRules(it.day, it.draft) }
         showForm()
         renderAll()
     }
